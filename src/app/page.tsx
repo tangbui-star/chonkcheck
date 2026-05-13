@@ -3,9 +3,12 @@
 import { useState } from "react";
 
 type AnalysisResult = {
+  species?: "cat" | "dog" | "other" | "unclear";
+  likely_breed?: string;
   bcs_score?: number;
   confidence?: "low" | "medium" | "high";
   summary?: string;
+  joke?: string;
   observations?: string[];
   recommendations?: string[];
   error?: string;
@@ -34,7 +37,7 @@ export default function Home() {
 
   async function analyzeCat() {
     if (!selectedImage) {
-      setResult({ error: "Please upload a cat photo first." });
+      setResult({ error: "Please upload a pet photo first." });
       return;
     }
 
@@ -65,7 +68,7 @@ export default function Home() {
       setResult(parsedResult);
     } catch {
       setResult({
-        error: "Something went wrong while analyzing the cat.",
+        error: "Something went wrong while analyzing the pet.",
       });
     } finally {
       setLoading(false);
@@ -76,14 +79,24 @@ export default function Home() {
     <main className="min-h-screen bg-orange-50 p-6">
       <div className="mx-auto max-w-3xl">
         <div className="rounded-3xl bg-white p-8 shadow-xl">
-        <img
-  src="/logo.png"
-  alt="ChonkCheck logo"
-  className="mx-auto mb-6 w-full max-w-sm"
-/>
-          <p className="mt-4 text-lg text-gray-600">
-            AI-powered cat body condition scoring and wellness tracking.
+          <img
+            src="/logo.png"
+            alt="ChonkCheck logo"
+            className="mx-auto mb-6 w-full max-w-sm"
+          />
+
+          <p className="mt-4 text-center text-lg text-gray-600">
+            AI-powered pet body condition scoring and wellness tracking.
           </p>
+
+          <div className="mt-6 rounded-2xl bg-yellow-50 p-4 text-sm text-yellow-900">
+            <p className="font-bold">Wellness estimate only</p>
+            <p className="mt-1">
+              ChonkCheck provides AI-generated body condition estimates and is
+              not veterinary advice. For health concerns, sudden weight changes,
+              appetite changes, or mobility issues, consult a veterinarian.
+            </p>
+          </div>
 
           <label className="mt-8 block cursor-pointer rounded-2xl border-2 border-dashed border-orange-300 bg-orange-100 p-6 text-center">
             <input
@@ -96,16 +109,16 @@ export default function Home() {
             {imagePreview ? (
               <img
                 src={imagePreview}
-                alt="Uploaded cat preview"
+                alt="Uploaded pet preview"
                 className="mx-auto max-h-96 rounded-xl object-contain"
               />
             ) : (
               <div>
                 <p className="text-lg font-medium text-gray-700">
-                  Click here to upload your cat photo
+                  Click here to upload your pet photo
                 </p>
                 <p className="mt-2 text-sm text-gray-500">
-                  JPG or PNG. Top-down standing photos work best.
+                  JPG or PNG. Standing side/top-down photos work best.
                 </p>
               </div>
             )}
@@ -116,7 +129,7 @@ export default function Home() {
               value={catName}
               onChange={(e) => setCatName(e.target.value)}
               className="rounded-xl border border-gray-300 p-4"
-              placeholder="Cat Name"
+              placeholder="Pet Name"
             />
 
             <input
@@ -130,7 +143,7 @@ export default function Home() {
               value={breed}
               onChange={(e) => setBreed(e.target.value)}
               className="rounded-xl border border-gray-300 p-4"
-              placeholder="Breed"
+              placeholder="Breed, if known"
             />
 
             <input
@@ -146,7 +159,7 @@ export default function Home() {
             disabled={loading}
             className="mt-8 w-full rounded-xl bg-orange-500 p-4 text-lg font-bold text-white hover:bg-orange-600 disabled:bg-gray-400"
           >
-            {loading ? "Analyzing..." : "Analyze My Cat"}
+            {loading ? "Analyzing..." : "Analyze My Pet"}
           </button>
 
           <div className="mt-8 rounded-2xl bg-gray-100 p-6">
@@ -156,7 +169,7 @@ export default function Home() {
 
             {!result && (
               <p className="mt-3 text-gray-600">
-                Your cat&apos;s body condition analysis will appear here.
+                Your pet&apos;s body condition analysis will appear here.
               </p>
             )}
 
@@ -166,6 +179,42 @@ export default function Home() {
 
             {result?.bcs_score && (
               <div className="mt-4 space-y-4">
+                {result.joke && (
+                  <div className="rounded-xl bg-orange-100 p-5 text-orange-900 shadow">
+                    <h3 className="font-bold">Plot twist!</h3>
+                    <p className="mt-2">{result.joke}</p>
+                  </div>
+                )}
+
+                <div className="grid gap-4 md:grid-cols-3">
+                  <div className="rounded-xl bg-white p-5 shadow">
+                    <p className="text-sm font-medium text-gray-500">
+                      Species
+                    </p>
+                    <p className="mt-2 text-2xl font-bold capitalize text-gray-900">
+                      {result.species}
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl bg-white p-5 shadow">
+                    <p className="text-sm font-medium text-gray-500">
+                      Likely Breed
+                    </p>
+                    <p className="mt-2 text-2xl font-bold text-gray-900">
+                      {result.likely_breed || "Unknown"}
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl bg-white p-5 shadow">
+                    <p className="text-sm font-medium text-gray-500">
+                      Confidence
+                    </p>
+                    <p className="mt-2 text-2xl font-bold capitalize text-gray-900">
+                      {result.confidence}
+                    </p>
+                  </div>
+                </div>
+
                 <div className="rounded-xl bg-white p-5 shadow">
                   <p className="text-sm font-medium text-gray-500">
                     Body Condition Score
@@ -173,10 +222,6 @@ export default function Home() {
 
                   <p className="mt-2 text-5xl font-bold text-orange-500">
                     {result.bcs_score}/9
-                  </p>
-
-                  <p className="mt-2 text-sm text-gray-600">
-                    Confidence: {result.confidence}
                   </p>
                 </div>
 

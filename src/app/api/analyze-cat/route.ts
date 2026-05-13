@@ -31,7 +31,7 @@ export async function POST(req: Request) {
         {
           role: "system",
           content:
-            "You are a feline body condition scoring assistant. You provide cautious, non-medical wellness feedback based on cat photos.",
+            "You are a friendly pet body condition scoring assistant. You analyze pet photos and give cautious, non-medical wellness feedback.",
         },
         {
           role: "user",
@@ -39,19 +39,34 @@ export async function POST(req: Request) {
             {
               type: "text",
               text: `
-Analyze this cat photo and information.
+Analyze this pet photo and information.
 
-Cat name: ${catName || "Not provided"}
-Age: ${age || "Not provided"}
-Breed: ${breed || "Not provided"}
-Weight: ${weight || "Not provided"}
+Provided name: ${catName || "Not provided"}
+Provided age: ${age || "Not provided"}
+Provided breed: ${breed || "Not provided"}
+Provided weight: ${weight || "Not provided"}
+
+First determine whether the animal appears to be:
+- cat
+- dog
+- other animal
+- unclear
+
+If it is a dog or other non-cat animal:
+- Still provide a body condition estimate
+- Guess the likely breed or breed mix if possible
+- Include a playful joke about how this is ChonkCheck and the pet is not a cat
+- Keep the joke kind and short
 
 Return ONLY valid JSON in this exact format:
 
 {
+  "species": "cat" | "dog" | "other" | "unclear",
+  "likely_breed": "best guess or unknown",
   "bcs_score": number,
   "confidence": "low" | "medium" | "high",
   "summary": "short summary",
+  "joke": "short joke if not a cat, otherwise empty string",
   "observations": [
     "observation 1",
     "observation 2"
@@ -64,6 +79,10 @@ Return ONLY valid JSON in this exact format:
 
 Rules:
 - Body condition score must be between 1 and 9
+- For cats, use feline body condition scoring logic
+- For dogs, use canine body condition scoring logic
+- For other animals, be extra cautious and lower confidence
+- If the image is unclear, set species to "unclear" and confidence to "low"
 - Be cautious and non-medical
 - Mention uncertainty if the image quality is poor
 - Recommendations should be gentle and practical
