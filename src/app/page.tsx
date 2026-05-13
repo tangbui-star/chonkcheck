@@ -76,8 +76,11 @@ export default function Home() {
     <main className="min-h-screen bg-orange-50 p-6">
       <div className="mx-auto max-w-3xl">
         <div className="rounded-3xl bg-white p-8 shadow-xl">
-          <h1 className="text-5xl font-bold text-gray-900">ChonkCheck</h1>
-
+        <img
+  src="/logo.png"
+  alt="ChonkCheck logo"
+  className="mx-auto mb-6 w-full max-w-sm"
+/>
           <p className="mt-4 text-lg text-gray-600">
             AI-powered cat body condition scoring and wellness tracking.
           </p>
