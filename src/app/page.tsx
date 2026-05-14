@@ -28,6 +28,7 @@ export default function Home() {
 
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   function handleImageUpload(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -71,7 +72,7 @@ export default function Home() {
       setResult(parsedResult);
     } catch {
       setResult({
-        error: "Something went wrong while analyzing the pet.",
+        error: "Something went wrong while analyzing the chonk.",
       });
     } finally {
       setLoading(false);
@@ -83,9 +84,22 @@ export default function Home() {
     return `${Math.min(Math.max(score, 1), 9) * 11.11}%`;
   }
 
-  function copyShareText() {
+  async function copyShareText() {
     if (!result?.share_text) return;
-    navigator.clipboard.writeText(result.share_text);
+
+    try {
+      await navigator.clipboard.writeText(result.share_text);
+    } catch {
+      const textArea = document.createElement("textarea");
+      textArea.value = result.share_text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+    }
+
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }
 
   return (
@@ -128,7 +142,7 @@ export default function Home() {
             ) : (
               <div>
                 <p className="text-lg font-medium text-gray-700">
-                  Click here to upload your pet photo
+                  Click here to upload your chonk photo
                 </p>
                 <p className="mt-2 text-sm text-gray-500">
                   JPG or PNG. Standing side/top-down photos work best.
@@ -172,7 +186,7 @@ export default function Home() {
             disabled={loading}
             className="mt-8 w-full rounded-xl bg-orange-500 p-4 text-lg font-bold text-white hover:bg-orange-600 disabled:bg-gray-400"
           >
-            {loading ? "Analyzing..." : "Analyze My Pet"}
+            {loading ? "Analyzing Chonker Physics..." : "Analyze My Chonk"}
           </button>
 
           <div className="mt-8 rounded-2xl bg-gray-100 p-6">
@@ -182,7 +196,7 @@ export default function Home() {
 
             {!result && (
               <p className="mt-3 text-gray-600">
-                Your pet&apos;s body condition analysis will appear here.
+                Your chonk&apos;s body condition analysis will appear here.
               </p>
             )}
 
@@ -201,7 +215,7 @@ export default function Home() {
 
                 <div className="rounded-2xl bg-white p-6 text-center shadow">
                   <p className="text-sm font-medium text-gray-500">
-                    Chonk Score
+                    Chonk Result
                   </p>
 
                   <p className="mt-2 text-6xl font-extrabold text-orange-500">
@@ -257,8 +271,22 @@ export default function Home() {
                 </div>
 
                 <div className="rounded-xl bg-white p-5 shadow">
-                  <h3 className="font-bold text-gray-900">Summary</h3>
-                  <p className="mt-2 text-gray-700">{result.summary}</p>
+                  <h3 className="font-bold text-gray-900">
+                    Official Chonk Analysis 🐾
+                  </h3>
+
+                  <p className="mt-3 text-lg font-medium text-orange-600">
+                    {result.score_label === "Lean" &&
+                      "A sleek little speed chonk."}
+                    {result.score_label === "Ideal" &&
+                      "A well-balanced and healthy chonker."}
+                    {result.score_label === "Chonky" &&
+                      "Certified premium household chonk."}
+                    {result.score_label === "Oh Lawd" &&
+                      "Oh lawd... this chonker has achieved legendary status."}
+                  </p>
+
+                  <p className="mt-3 text-gray-700">{result.summary}</p>
                 </div>
 
                 {result.photo_quality_notes &&
@@ -300,13 +328,17 @@ export default function Home() {
                       onClick={copyShareText}
                       className="mt-4 rounded-xl bg-white px-4 py-3 font-bold text-orange-600 hover:bg-orange-50"
                     >
-                      Copy Share Text
+                      {copied ? "Copied!" : "Copy Share Text"}
                     </button>
                   </div>
                 )}
               </div>
             )}
           </div>
+
+          <p className="mt-8 text-center text-sm text-gray-400">
+            Powered by AI, snacks, and questionable feline decisions.
+          </p>
         </div>
       </div>
     </main>

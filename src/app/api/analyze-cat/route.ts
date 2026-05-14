@@ -27,7 +27,7 @@ export async function POST(req: Request) {
         {
           role: "system",
           content:
-            "You are a friendly pet body condition scoring assistant. You provide cautious, non-medical wellness feedback with playful personality.",
+            "You are a friendly pet body condition scoring assistant. You provide cautious, non-medical wellness feedback with playful chonk-themed personality.",
         },
         {
           role: "user",
@@ -50,7 +50,7 @@ Return ONLY valid JSON:
   "bcs_score": number,
   "score_label": "Lean" | "Ideal" | "Chonky" | "Oh Lawd",
   "confidence": "low" | "medium" | "high",
-  "summary": "short summary",
+  "summary": "short summary with a funny cute chonk-related phrase",
   "joke": "short joke if not a cat, otherwise empty string",
   "photo_quality_notes": [
     "photo quality note 1"
@@ -61,7 +61,7 @@ Return ONLY valid JSON:
   "recommendations": [
     "recommendation 1"
   ],
-  "share_text": "short fun shareable result"
+  "share_text": "fun meme-like sentence about the pet's chonk level suitable for social sharing"
 }
 
 Rules:
@@ -70,6 +70,9 @@ Rules:
 - 4-5 = Ideal
 - 6-7 = Chonky
 - 8-9 = Oh Lawd
+- The summary must always include a cute or funny chonk-related reference
+- share_text should be funny, cute, meme-like, and internet-shareable
+- include chonk/chonker terminology when appropriate
 - If not a cat, include a kind funny joke
 - If photo is poor, mention uncertainty in photo_quality_notes
 - Be cautious and non-medical
