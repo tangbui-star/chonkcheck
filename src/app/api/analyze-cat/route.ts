@@ -5,21 +5,17 @@ export async function POST(req: Request) {
     const formData = await req.formData();
 
     const image = formData.get("image") as File | null;
-    const catName = formData.get("catName") as string;
+    const petName = formData.get("catName") as string;
     const age = formData.get("age") as string;
     const breed = formData.get("breed") as string;
     const weight = formData.get("weight") as string;
 
     if (!image) {
-      return Response.json(
-        { error: "No image uploaded." },
-        { status: 400 }
-      );
+      return Response.json({ error: "No image uploaded." }, { status: 400 });
     }
 
     const bytes = await image.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const base64Image = buffer.toString("base64");
+    const base64Image = Buffer.from(bytes).toString("base64");
 
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
@@ -31,7 +27,7 @@ export async function POST(req: Request) {
         {
           role: "system",
           content:
-            "You are a friendly pet body condition scoring assistant. You analyze pet photos and give cautious, non-medical wellness feedback.",
+            "You are a friendly pet body condition scoring assistant. You provide cautious, non-medical wellness feedback with playful personality.",
         },
         {
           role: "user",
@@ -41,51 +37,42 @@ export async function POST(req: Request) {
               text: `
 Analyze this pet photo and information.
 
-Provided name: ${catName || "Not provided"}
-Provided age: ${age || "Not provided"}
-Provided breed: ${breed || "Not provided"}
-Provided weight: ${weight || "Not provided"}
+Name: ${petName || "Not provided"}
+Age: ${age || "Not provided"}
+Breed: ${breed || "Not provided"}
+Weight: ${weight || "Not provided"}
 
-First determine whether the animal appears to be:
-- cat
-- dog
-- other animal
-- unclear
-
-If it is a dog or other non-cat animal:
-- Still provide a body condition estimate
-- Guess the likely breed or breed mix if possible
-- Include a playful joke about how this is ChonkCheck and the pet is not a cat
-- Keep the joke kind and short
-
-Return ONLY valid JSON in this exact format:
+Return ONLY valid JSON:
 
 {
   "species": "cat" | "dog" | "other" | "unclear",
   "likely_breed": "best guess or unknown",
   "bcs_score": number,
+  "score_label": "Lean" | "Ideal" | "Chonky" | "Oh Lawd",
   "confidence": "low" | "medium" | "high",
   "summary": "short summary",
   "joke": "short joke if not a cat, otherwise empty string",
+  "photo_quality_notes": [
+    "photo quality note 1"
+  ],
   "observations": [
-    "observation 1",
-    "observation 2"
+    "observation 1"
   ],
   "recommendations": [
-    "recommendation 1",
-    "recommendation 2"
-  ]
+    "recommendation 1"
+  ],
+  "share_text": "short fun shareable result"
 }
 
 Rules:
-- Body condition score must be between 1 and 9
-- For cats, use feline body condition scoring logic
-- For dogs, use canine body condition scoring logic
-- For other animals, be extra cautious and lower confidence
-- If the image is unclear, set species to "unclear" and confidence to "low"
+- BCS must be 1-9
+- 1-3 = Lean
+- 4-5 = Ideal
+- 6-7 = Chonky
+- 8-9 = Oh Lawd
+- If not a cat, include a kind funny joke
+- If photo is poor, mention uncertainty in photo_quality_notes
 - Be cautious and non-medical
-- Mention uncertainty if the image quality is poor
-- Recommendations should be gentle and practical
 - Do not include markdown
 - Do not include extra commentary
 `,
@@ -108,9 +95,7 @@ Rules:
     console.error("FULL ERROR:", error);
 
     return Response.json(
-      {
-        error: "Analysis failed. Check terminal for details.",
-      },
+      { error: "Analysis failed. Check terminal for details." },
       { status: 500 }
     );
   }

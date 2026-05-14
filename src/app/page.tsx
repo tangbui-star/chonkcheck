@@ -6,11 +6,14 @@ type AnalysisResult = {
   species?: "cat" | "dog" | "other" | "unclear";
   likely_breed?: string;
   bcs_score?: number;
+  score_label?: "Lean" | "Ideal" | "Chonky" | "Oh Lawd";
   confidence?: "low" | "medium" | "high";
   summary?: string;
   joke?: string;
+  photo_quality_notes?: string[];
   observations?: string[];
   recommendations?: string[];
+  share_text?: string;
   error?: string;
 };
 
@@ -73,6 +76,16 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function getScoreWidth(score?: number) {
+    if (!score) return "0%";
+    return `${Math.min(Math.max(score, 1), 9) * 11.11}%`;
+  }
+
+  function copyShareText() {
+    if (!result?.share_text) return;
+    navigator.clipboard.writeText(result.share_text);
   }
 
   return (
@@ -186,6 +199,34 @@ export default function Home() {
                   </div>
                 )}
 
+                <div className="rounded-2xl bg-white p-6 text-center shadow">
+                  <p className="text-sm font-medium text-gray-500">
+                    Chonk Score
+                  </p>
+
+                  <p className="mt-2 text-6xl font-extrabold text-orange-500">
+                    {result.bcs_score}/9
+                  </p>
+
+                  <p className="mt-2 text-2xl font-bold text-gray-900">
+                    {result.score_label}
+                  </p>
+
+                  <div className="mt-5 h-4 overflow-hidden rounded-full bg-gray-200">
+                    <div
+                      className="h-full rounded-full bg-orange-500"
+                      style={{ width: getScoreWidth(result.bcs_score) }}
+                    />
+                  </div>
+
+                  <div className="mt-2 flex justify-between text-xs text-gray-500">
+                    <span>Lean</span>
+                    <span>Ideal</span>
+                    <span>Chonky</span>
+                    <span>Oh Lawd</span>
+                  </div>
+                </div>
+
                 <div className="grid gap-4 md:grid-cols-3">
                   <div className="rounded-xl bg-white p-5 shadow">
                     <p className="text-sm font-medium text-gray-500">
@@ -200,7 +241,7 @@ export default function Home() {
                     <p className="text-sm font-medium text-gray-500">
                       Likely Breed
                     </p>
-                    <p className="mt-2 text-2xl font-bold text-gray-900">
+                    <p className="mt-2 text-xl font-bold text-gray-900">
                       {result.likely_breed || "Unknown"}
                     </p>
                   </div>
@@ -216,19 +257,21 @@ export default function Home() {
                 </div>
 
                 <div className="rounded-xl bg-white p-5 shadow">
-                  <p className="text-sm font-medium text-gray-500">
-                    Body Condition Score
-                  </p>
-
-                  <p className="mt-2 text-5xl font-bold text-orange-500">
-                    {result.bcs_score}/9
-                  </p>
-                </div>
-
-                <div className="rounded-xl bg-white p-5 shadow">
                   <h3 className="font-bold text-gray-900">Summary</h3>
                   <p className="mt-2 text-gray-700">{result.summary}</p>
                 </div>
+
+                {result.photo_quality_notes &&
+                  result.photo_quality_notes.length > 0 && (
+                    <div className="rounded-xl bg-yellow-50 p-5 text-yellow-900 shadow">
+                      <h3 className="font-bold">Photo Quality Notes</h3>
+                      <ul className="mt-2 list-disc space-y-1 pl-5">
+                        {result.photo_quality_notes.map((item, index) => (
+                          <li key={index}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
                 <div className="rounded-xl bg-white p-5 shadow">
                   <h3 className="font-bold text-gray-900">Observations</h3>
@@ -247,6 +290,20 @@ export default function Home() {
                     ))}
                   </ul>
                 </div>
+
+                {result.share_text && (
+                  <div className="rounded-2xl bg-orange-500 p-6 text-white shadow">
+                    <h3 className="text-xl font-bold">Shareable Result</h3>
+                    <p className="mt-2 text-lg">{result.share_text}</p>
+
+                    <button
+                      onClick={copyShareText}
+                      className="mt-4 rounded-xl bg-white px-4 py-3 font-bold text-orange-600 hover:bg-orange-50"
+                    >
+                      Copy Share Text
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
