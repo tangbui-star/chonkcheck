@@ -10,7 +10,6 @@ type AnalysisResult = {
   confidence?: "low" | "medium" | "high";
   summary?: string;
   joke?: string;
-  photo_quality_notes?: string[];
   observations?: string[];
   recommendations?: string[];
   share_text?: string;
@@ -84,6 +83,19 @@ export default function Home() {
     return `${Math.min(Math.max(score, 1), 9) * 11.11}%`;
   }
 
+  function shouldShowBreedCard() {
+    if (!result?.likely_breed) return false;
+
+    const breedText = result.likely_breed.toLowerCase().trim();
+
+    return (
+      breedText !== "unknown" &&
+      breedText !== "best guess or unknown" &&
+      breedText !== "not provided" &&
+      breedText !== "unclear"
+    );
+  }
+
   async function copyShareText() {
     if (!result?.share_text) return;
 
@@ -101,6 +113,9 @@ export default function Home() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
+
+  const inputClass =
+    "rounded-xl border border-gray-300 p-4 text-gray-900 placeholder:text-gray-500";
 
   return (
     <main className="min-h-screen bg-orange-50 p-6">
@@ -151,34 +166,40 @@ export default function Home() {
             )}
           </label>
 
-          <div className="mt-8 grid gap-4">
-            <input
-              value={catName}
-              onChange={(e) => setCatName(e.target.value)}
-              className="rounded-xl border border-gray-300 p-4"
-              placeholder="Pet Name"
-            />
+          <div className="mt-8">
+            <p className="mb-3 text-sm font-medium text-gray-600">
+              Optional details — add these for a better estimate
+            </p>
 
-            <input
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
-              className="rounded-xl border border-gray-300 p-4"
-              placeholder="Age"
-            />
+            <div className="grid gap-4">
+              <input
+                value={catName}
+                onChange={(e) => setCatName(e.target.value)}
+                className={inputClass}
+                placeholder="Pet name (optional)"
+              />
 
-            <input
-              value={breed}
-              onChange={(e) => setBreed(e.target.value)}
-              className="rounded-xl border border-gray-300 p-4"
-              placeholder="Breed, if known"
-            />
+              <input
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                className={inputClass}
+                placeholder="Age (optional)"
+              />
 
-            <input
-              value={weight}
-              onChange={(e) => setWeight(e.target.value)}
-              className="rounded-xl border border-gray-300 p-4"
-              placeholder="Weight"
-            />
+              <input
+                value={breed}
+                onChange={(e) => setBreed(e.target.value)}
+                className={inputClass}
+                placeholder="Breed, if known (optional)"
+              />
+
+              <input
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+                className={inputClass}
+                placeholder="Weight (optional)"
+              />
+            </div>
           </div>
 
           <button
@@ -208,7 +229,7 @@ export default function Home() {
               <div className="mt-4 space-y-4">
                 {result.joke && (
                   <div className="rounded-xl bg-orange-100 p-5 text-orange-900 shadow">
-                    <h3 className="font-bold">Plot twist!</h3>
+                    <h3 className="font-bold">Chonk Joke 🐾</h3>
                     <p className="mt-2">{result.joke}</p>
                   </div>
                 )}
@@ -241,7 +262,11 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-3">
+                <div
+                  className={`grid gap-4 ${
+                    shouldShowBreedCard() ? "md:grid-cols-3" : "md:grid-cols-2"
+                  }`}
+                >
                   <div className="rounded-xl bg-white p-5 shadow">
                     <p className="text-sm font-medium text-gray-500">
                       Species
@@ -251,14 +276,16 @@ export default function Home() {
                     </p>
                   </div>
 
-                  <div className="rounded-xl bg-white p-5 shadow">
-                    <p className="text-sm font-medium text-gray-500">
-                      Likely Breed
-                    </p>
-                    <p className="mt-2 text-xl font-bold text-gray-900">
-                      {result.likely_breed || "Unknown"}
-                    </p>
-                  </div>
+                  {shouldShowBreedCard() && (
+                    <div className="rounded-xl bg-white p-5 shadow">
+                      <p className="text-sm font-medium text-gray-500">
+                        Likely Breed
+                      </p>
+                      <p className="mt-2 text-xl font-bold text-gray-900">
+                        {result.likely_breed}
+                      </p>
+                    </div>
+                  )}
 
                   <div className="rounded-xl bg-white p-5 shadow">
                     <p className="text-sm font-medium text-gray-500">
@@ -288,18 +315,6 @@ export default function Home() {
 
                   <p className="mt-3 text-gray-700">{result.summary}</p>
                 </div>
-
-                {result.photo_quality_notes &&
-                  result.photo_quality_notes.length > 0 && (
-                    <div className="rounded-xl bg-yellow-50 p-5 text-yellow-900 shadow">
-                      <h3 className="font-bold">Photo Quality Notes</h3>
-                      <ul className="mt-2 list-disc space-y-1 pl-5">
-                        {result.photo_quality_notes.map((item, index) => (
-                          <li key={index}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
 
                 <div className="rounded-xl bg-white p-5 shadow">
                   <h3 className="font-bold text-gray-900">Observations</h3>

@@ -51,10 +51,7 @@ Return ONLY valid JSON:
   "score_label": "Lean" | "Ideal" | "Chonky" | "Oh Lawd",
   "confidence": "low" | "medium" | "high",
   "summary": "short summary with a funny cute chonk-related phrase",
-  "joke": "short joke if not a cat, otherwise empty string",
-  "photo_quality_notes": [
-    "photo quality note 1"
-  ],
+  "joke": "short cute joke for every pet scan",
   "observations": [
     "observation 1"
   ],
@@ -71,10 +68,12 @@ Rules:
 - 6-7 = Chonky
 - 8-9 = Oh Lawd
 - The summary must always include a cute or funny chonk-related reference
+- joke must always be included
+- If species is cat, joke should be a cute cat/chonk joke
+- If species is not cat, joke should kindly mention the pet is not a cat
 - share_text should be funny, cute, meme-like, and internet-shareable
 - include chonk/chonker terminology when appropriate
-- If not a cat, include a kind funny joke
-- If photo is poor, mention uncertainty in photo_quality_notes
+- If photo is poor, mention uncertainty inside observations, not in a separate section
 - Be cautious and non-medical
 - Do not include markdown
 - Do not include extra commentary
